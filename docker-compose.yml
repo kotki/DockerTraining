@@ -1,0 +1,25 @@
+version: "3"
+services:
+    web1:
+        build:
+            context: .
+            dockerfile: ./WebAPI1/Dockerfile
+        environment:
+            - REDIS_URL=nosql.data
+            - DockerTestConnectionString=Server=sql.data;Database=DockerTest;User Id=sa;Password=Passw0rd
+        ports:
+            - "8080:80"
+        depends_on:
+            - nosql.data
+    nosql.data:
+        image: "redis"
+        ports:
+            - "6379:6379"
+    sql.data:
+        build:
+          context: .
+          dockerfile: ./SqlData/Dockerfile
+        ports:
+            - "14333:1433"
+        # volumes:
+        #     - C:\Users\okotkevych\Desktop\DockerTestApps\SqlData\BackupFolder:/var/opt/mssql
