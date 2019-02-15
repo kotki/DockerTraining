@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -13,70 +11,47 @@ namespace WebAPI1.Controllers
     public class ValuesController : ControllerBase
     {
         private readonly IConfiguration _config;
-        //private readonly DockerTestContext _context;
-        private readonly IHttpClientFactory _clientFactory;
+        private readonly DockerTestContext _context;
 
         private readonly string _redisKey = "SomeRandomRedisKey";
 
         public ValuesController(IConfiguration config,
-                                //DockerTestContext context,
-                                IHttpClientFactory clientFactory)
+                                DockerTestContext context)
         {
             _config = config;
-            //_context = context;
-            _clientFactory = clientFactory;
+            _context = context;
         }
 
         [HttpGet]
         public async Task<ActionResult<string>> Get()
         {
-            string result = null;
+            var rcstring = _config.GetValue<string>("REDIS_URL");
+            //var rcstring = "localhost:6379";
 
-            var client = _clientFactory.CreateClient();
+            string result = string.Empty;
 
-            var request = new HttpRequestMessage(HttpMethod.Get,
-                "http://localhost:51442/api/values");
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(rcstring);
+            IDatabase db = redis.GetDatabase();
 
-            var response = await client.SendAsync(request);
+            var cache = db.StringGet(_redisKey);
 
-            if (response.IsSuccessStatusCode)
+            if (cache.IsNullOrEmpty)
             {
-                result = await response.Content.ReadAsStringAsync();
+                //change to aggregate
+                var dbstrings = _context.DockerTestTable.Select(dtt => dtt.ToString());
+                foreach (var s in dbstrings)
+                {
+                    result += s;
+                }
+
+                db.StringSet(_redisKey, result);
             }
             else
             {
-                result = "Something vent wrong with response!";
+                result = cache.ToString() + " from redis!"; ;
             }
 
             return result;
-
-            //var rcString = _config.GetValue<string>("REDIS_URL");
-            ////var rcString = "localhost:6379";
-
-            //string result = string.Empty;
-
-            //ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(rcString);
-            //IDatabase db = redis.GetDatabase();
-
-            //var cache = db.StringGet(_redisKey);
-
-            //if (cache.IsNullOrEmpty)
-            //{
-            //    //change to aggregate
-            //    var dbStrings = _context.DockerTestTable.Select(dtt => dtt.ToString());
-            //    foreach(var s in dbStrings)
-            //    {
-            //        result += s;
-            //    }
-
-            //    db.StringSet(_redisKey, result);
-            //}
-            //else
-            //{
-            //    result = cache.ToString() + " from REDIS!";;
-            //}
-
-            //return result;
         }
     }
 }

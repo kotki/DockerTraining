@@ -21,13 +21,13 @@ namespace WebAPI1
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            //var connection = Configuration.GetConnectionString("DefaultConnection");
-            //var connection = Configuration.GetValue<string>("DockerTestConnectionString");
+            // var connection = Configuration.GetConnectionString("DefaultConnection");
+            // var connection = Configuration.GetConnectionString("DockerTestConnectionString");
+            var connection = Configuration.GetValue<string>("DockerTestConnectionString");
 
-            //services.AddDbContext<DockerTestContext>(options =>
-            //    options.UseSqlServer(connection));
+            services.AddDbContext<DockerTestContext>(options =>
+               options.UseSqlServer(connection));
             services.AddMvc();
-            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,12 +1,25 @@
 version: "3"
 services:
-    web1:
+    web2.api:
+        build:
+            context: .
+            dockerfile: ./WebAPI2/Dockerfile
+        environment:
+            - WEB1_URL=http://web1.api
+        ports:
+            - "8081:80"
+        depends_on:
+            - web1.api
+    web1.api:
         build:
             context: .
             dockerfile: ./WebAPI1/Dockerfile
         environment:
             - REDIS_URL=nosql.data
-            - DockerTestConnectionString=Server=sql.data;Database=DockerTest;User Id=sa;Password=Passw0rd
+            # - ConnectionString=${DockerTestConnectionString:-Server=sql.data;Database=DockerTest;User Id=sa;Password=Passw0rd}
+            - DockerTestConnectionString=Server=sql.data;Initial Catalog=DockerTest;User Id=sa;Password=Passw0rd
+            # - ConnectionString=Server=sql.data;Initial Catalog=CatalogData;User Id=sa;Password=your@password
+            # ConnectionString=${ESHOP_AZURE_CATALOG_DB:-Server=sql.data;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word}
         ports:
             - "8080:80"
         depends_on:
