@@ -45,7 +45,7 @@ namespace WebAPI2.Controllers
             }
             else
             {
-                result = "Something vent wrong with response!";
+                result = "Something went wrong with response!";
             }
 
             return result;

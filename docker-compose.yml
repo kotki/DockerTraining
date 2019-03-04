@@ -19,7 +19,6 @@ services:
             # - ConnectionString=${DockerTestConnectionString:-Server=sql.data;Database=DockerTest;User Id=sa;Password=Passw0rd}
             - DockerTestConnectionString=Server=sql.data;Initial Catalog=DockerTest;User Id=sa;Password=Passw0rd
             # - ConnectionString=Server=sql.data;Initial Catalog=CatalogData;User Id=sa;Password=your@password
-            # ConnectionString=${ESHOP_AZURE_CATALOG_DB:-Server=sql.data;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word}
         ports:
             - "8080:80"
         depends_on:
